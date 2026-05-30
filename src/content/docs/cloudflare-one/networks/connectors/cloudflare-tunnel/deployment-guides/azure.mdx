@@ -1,0 +1,82 @@
+---
+pcx_content_type: how-to
+description: Azure in Zero Trust networking.
+products:
+  - cloudflare-one
+title: Azure
+tags:
+  - Azure
+sidebar:
+  order: 3
+head:
+  - tag: title
+    content: Deploy cloudflared in Azure
+---
+
+import { Render } from "~/components";
+
+This guide covers how to connect an Azure Virtual Machine to Cloudflare using our lightweight connector, `cloudflared`.
+
+We will deploy:
+
+- An Azure VM that runs a basic HTTP server.
+- A Cloudflare Tunnel that allows users to connect to the service via either a public hostname or a private IP address.
+
+<Render file="tunnel/connectivity-prechecks-note" product="cloudflare-one" />
+
+### Prerequisites
+
+To complete the following procedure, you will need to:
+
+- [Add a website to Cloudflare](/fundamentals/manage-domains/add-site/)
+- [Deploy the Cloudflare One Client](/cloudflare-one/team-and-resources/devices/cloudflare-one-client/deployment/manual-deployment/) on an end-user device
+
+## 1. Create a VM instance in Azure
+
+<Render
+	file="tunnel/deployment-guides/deploy-azure-vm"
+	product="cloudflare-one"
+	params={{ product: "cloudflare-one" }}
+/>
+
+## 2. Create a Cloudflare Tunnel
+
+<Render
+	file="tunnel/deployment-guides/cloud-create-tunnel"
+	product="cloudflare-one"
+	params={{ one: "Azure VM", two: "azure" }}
+/>
+
+## 3. Connect using a public hostname
+
+<Render
+	file="tunnel/deployment-guides/cloud-public-hostname"
+	product="cloudflare-one"
+/>
+
+## 4. Connect using a private IP
+
+<Render
+	file="tunnel/deployment-guides/cloud-private-ip"
+	product="cloudflare-one"
+	params={{
+		networkName: "Azure Virtual Network (VNet)",
+		resourceName: "Azure VM",
+		exampleIp: "10.0.0.4",
+		splitTunnelCidr: "10.0.0.0/8",
+		calcExclude: ["10.0.0.4", "10.0.1.0/24"],
+	}}
+/>
+
+## Firewall configuration
+
+<Render
+	file="tunnel/deployment-guides/deploy-azure-firewall"
+	product="cloudflare-one"
+	params={{
+		tunnelFirewallURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-with-firewall/#required-for-tunnel-operation",
+		hostnameAnchor: "#3-connect-using-a-public-hostname",
+		privateIpAnchor: "#4-connect-using-a-private-ip",
+	}}
+/>

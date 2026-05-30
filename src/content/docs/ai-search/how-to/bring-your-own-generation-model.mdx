@@ -1,0 +1,75 @@
+---
+pcx_content_type: concept
+title: Bring your own generation model
+description: Use AI Search for retrieval while generating responses with an external model like OpenAI.
+tags:
+  - AI
+sidebar:
+  order: 5
+products:
+  - ai-search
+---
+
+import { TypeScriptExample } from "~/components";
+
+When using AI Search, AI Search uses a Workers AI model to generate the response. If you want to use a model outside of Workers AI, you can use AI Search for `search` while using a different model to generate responses.
+
+This example uses an OpenAI model to generate responses from AI Search results. It uses the [Workers binding](/ai-search/api/search/workers-binding/).
+
+:::note
+AI Search supports [bringing your own models natively](/ai-search/configuration/models/). You can attach provider keys through AI Gateway and select third-party models directly in your AI Search settings. The example below still works, but the recommended approach is to configure your external model through AI Gateway.
+:::
+
+<TypeScriptExample>
+
+```ts
+import { openai } from "@ai-sdk/openai";
+import { generateText } from "ai";
+
+export interface Env {
+	AI_SEARCH: AiSearchNamespace;
+	OPENAI_API_KEY: string;
+}
+
+export default {
+	async fetch(request, env): Promise<Response> {
+		const url = new URL(request.url);
+
+		const userQuery = url.searchParams.get("query") ?? "What is Cloudflare?";
+
+		// Search for documents in AI Search
+		const searchResult = await env.AI_SEARCH.get("my-instance").search({
+			messages: [{ role: "user", content: userQuery }],
+		});
+
+		if (searchResult.chunks.length === 0) {
+			return Response.json({ text: `No data found for query "${userQuery}"` });
+		}
+
+		// Join all document chunks into a single string
+		const chunks = searchResult.chunks
+			.map((chunk) => {
+				return `<file name="${chunk.item.key}">${chunk.text}</file>`;
+			})
+			.join("\n\n");
+
+		// Send the user query + matched documents to OpenAI for answer
+		const generateResult = await generateText({
+			model: openai("gpt-4o-mini"),
+			messages: [
+				{
+					role: "system",
+					content:
+						"You are a helpful assistant and your task is to answer the user question using the provided files.",
+				},
+				{ role: "user", content: chunks },
+				{ role: "user", content: userQuery },
+			],
+		});
+
+		return Response.json({ text: generateResult.text });
+	},
+} satisfies ExportedHandler<Env>;
+```
+
+</TypeScriptExample>

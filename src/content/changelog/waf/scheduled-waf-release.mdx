@@ -1,0 +1,39 @@
+---
+title: WAF Release - Scheduled changes for 2026-05-18
+description: WAF managed ruleset changes scheduled for 2026-05-18
+date: 2026-05-11
+publish_future_dated_entry: true
+---
+ 
+import { RuleID } from "~/components";
+ 
+<table style="width: 100%">
+	<thead>
+		<tr>
+			<th>Announcement Date</th>
+			<th>Release Date</th>
+			<th>Release Behavior</th>
+			<th>Legacy Rule ID</th>
+			<th>Rule ID</th>
+			<th>Description</th>
+			<th>Comments</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>2026-05-11</td>
+			<td>2026-05-18</td>
+			<td>Disabled</td>
+			<td>N/A</td>
+			<td>
+				<RuleID id="bcdcec3ea63a480896513dc39e9c068d" />
+			</td>
+			<td>Sitecore - Cache Poisoning - CVE:CVE-2025-53693</td>
+			<td>
+				This is a new detection. This rule will be merged into the original rule
+				"Remote Code Execution - Java Deserialization" (ID:{" "}
+				<RuleID id="d1bd7563e6254db48ce703807c5b669c" />)
+			</td>
+		</tr>	
+	</tbody>
+</table>

@@ -1,0 +1,87 @@
+---
+pcx_content_type: how-to
+description: AWS in Zero Trust networking.
+products:
+  - cloudflare-one
+title: AWS
+tags:
+  - AWS
+sidebar:
+  order: 2
+head:
+  - tag: title
+    content: Deploy cloudflared in AWS
+---
+
+import { Render } from "~/components";
+
+This guide covers how to connect an Amazon Web Services (AWS) virtual machine to Cloudflare using our lightweight connector, `cloudflared`.
+
+We will deploy:
+
+- An EC2 virtual machine that runs a basic HTTP server.
+- A Cloudflare Tunnel that allows users to connect to the service via either a public hostname or a private IP address.
+
+<Render file="tunnel/connectivity-prechecks-note" product="cloudflare-one" />
+
+### Prerequisites
+
+To complete the following procedure, you will need to:
+
+- [Add a website to Cloudflare](/fundamentals/manage-domains/add-site/)
+- [Deploy the Cloudflare One Client](/cloudflare-one/team-and-resources/devices/cloudflare-one-client/deployment/manual-deployment/) on an end-user device
+
+## 1. Create a VM instance in AWS
+
+<Render
+	file="tunnel/deployment-guides/deploy-aws-ec2-instance"
+	product="cloudflare-one"
+/>
+
+## 2. Create a Cloudflare Tunnel
+
+<Render
+	file="tunnel/deployment-guides/cloud-create-tunnel"
+	product="cloudflare-one"
+	params={{ one: "AWS instance", two: "aws" }}
+/>
+
+## 3. Connect using a public hostname
+
+<Render
+	file="tunnel/deployment-guides/cloud-public-hostname"
+	product="cloudflare-one"
+/>
+
+## 4. Connect using a private IP
+
+<Render
+	file="tunnel/deployment-guides/cloud-private-ip"
+	product="cloudflare-one"
+	params={{
+		networkName: "virtual private cloud (VPC)",
+		resourceName: "AWS instance",
+		exampleIp: "172.31.19.0",
+		splitTunnelCidr: "172.16.0.0/12",
+		calcExclude: ["172.31.19.0", "172.24.0.0/16"],
+	}}
+/>
+
+:::caution
+
+<Render file="aws-resolver" product="cloudflare-one" />
+
+:::
+
+## Firewall configuration
+
+<Render
+	file="tunnel/deployment-guides/deploy-aws-firewall"
+	product="cloudflare-one"
+	params={{
+		tunnelFirewallURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-with-firewall/#required-for-tunnel-operation",
+		hostnameAnchor: "#3-connect-using-a-public-hostname",
+		privateIpAnchor: "#4-connect-using-a-private-ip",
+	}}
+/>

@@ -1,0 +1,10 @@
+---
+pcx_content_type: navigation
+title: KV
+external_link: /kv/api/
+head: []
+description: Global, low-latency, key-value data storage.
+
+products:
+  - workers
+---

@@ -1,0 +1,43 @@
+---
+pcx_content_type: concept
+title: Create a simple search engine
+description: Build a simple search engine using the AI Search Workers binding and the search method.
+sidebar:
+  order: 5
+products:
+  - ai-search
+---
+
+import { TypeScriptExample } from "~/components";
+
+Use the `search()` method to implement a simple search engine. This example uses the [Workers binding](/ai-search/api/search/workers-binding/), but can be adapted to use the [REST API](/ai-search/api/search/rest-api/) instead.
+
+To replicate this example:
+
+- Disable query rewriting so that the original user query is matched directly
+- Configure your AI Search instance to have small chunk sizes (256 tokens is usually enough)
+
+<TypeScriptExample>
+
+```ts
+export interface Env {
+	AI_SEARCH: AiSearchNamespace;
+}
+
+export default {
+	async fetch(request, env): Promise<Response> {
+		const url = new URL(request.url);
+		const userQuery = url.searchParams.get("query") ?? "What is Cloudflare?";
+
+		const searchResult = await env.AI_SEARCH.get("my-instance").search({
+			messages: [{ role: "user", content: userQuery }],
+		});
+
+		return Response.json({
+			files: searchResult.chunks.map((chunk) => chunk.item.key),
+		});
+	},
+} satisfies ExportedHandler<Env>;
+```
+
+</TypeScriptExample>

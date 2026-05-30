@@ -1,0 +1,56 @@
+---
+pcx_content_type: navigation
+title: RtkSpeakerSelector
+description: API reference for RtkSpeakerSelector component (React Library)
+products:
+  - realtime
+---
+A component which lets to manage your audio devices and audio preferences.
+ Emits `rtkStateUpdate` event with data for muting notification sounds:
+ ```ts
+ {
+  prefs: {
+    muteNotificationSounds: boolean
+  }
+ }
+ ```
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `iconPack` | `IconPack` | ❌ | `defaultIconPack` | Icon pack |
+| `meeting` | `Meeting` | ✅ | - | Meeting object |
+| `size` | `Size` | ✅ | - | Size |
+| `states` | `States` | ✅ | - | States object |
+| `t` | `RtkI18n` | ❌ | `useLanguage()` | Language |
+| `variant` | `'full' \| 'inline'` | ✅ | - | variant |
+
+## Usage Examples
+
+### Basic Usage
+
+```tsx
+import { RtkSpeakerSelector } from '@cloudflare/realtimekit-react-ui';
+
+function MyComponent() {
+  return <RtkSpeakerSelector />;
+}
+```
+
+### With Properties
+
+```tsx
+import { RtkSpeakerSelector } from '@cloudflare/realtimekit-react-ui';
+
+function MyComponent() {
+  return (
+    <RtkSpeakerSelector
+      meeting={meeting}
+      size="md"
+      variant={'full' | 'inline'}
+    />
+  );
+}
+```
+

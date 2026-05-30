@@ -1,0 +1,44 @@
+---
+pcx_content_type: navigation
+title: rtk-polls
+description: API reference for rtk-polls component (Web Components (HTML) Library)
+products:
+  - realtime
+---
+A component which lists all available plugins a user can access with
+ the ability to enable or disable them as per their permissions.
+
+## Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `config` | `UIConfig` | ❌ | `createDefaultConfig()` | Config |
+| `iconPack` | `IconPack` | ❌ | `defaultIconPack` | Icon pack |
+| `meeting` | `Meeting` | ✅ | - | Meeting object |
+| `size` | `Size` | ✅ | - | Size |
+| `t` | `RtkI18n` | ❌ | `useLanguage()` | Language |
+
+## Usage Examples
+
+### Basic Usage
+
+```html
+<rtk-polls></rtk-polls>
+```
+
+### With Properties
+
+```html
+<rtk-polls
+ size="md">
+</rtk-polls>
+```
+
+
+```html
+<script>
+  const el = document.querySelector("rtk-polls");
+
+  el.meeting= meeting
+</script>
+```

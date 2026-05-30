@@ -1,0 +1,33 @@
+---
+pcx_content_type: reference
+description: Reference information for Configuration file in Zero Trust networking.
+products:
+  - cloudflare-one
+title: Configuration file
+tags:
+  - YAML
+sidebar:
+  order: 2
+---
+
+import { Render } from "~/components";
+
+<Render
+	file="tunnel/locally-managed/configuration-file"
+	product="cloudflare-one"
+	params={{
+		showPrivateNetworking: "true",
+		quickTunnelsURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/tunnel-useful-terms/#quick-tunnels",
+		runParametersURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/",
+		createConfigFileURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/local-management/create-local-tunnel/#4-create-a-configuration-file",
+		originParametersURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/origin-parameters/",
+		protocolsURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/routing-to-tunnel/protocols/",
+		replicasURL:
+			"/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/tunnel-availability/",
+	}}
+/>

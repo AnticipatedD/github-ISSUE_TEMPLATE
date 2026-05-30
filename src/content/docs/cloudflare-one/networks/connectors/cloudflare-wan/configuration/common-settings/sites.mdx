@@ -1,0 +1,24 @@
+---
+title: Set up a site
+pcx_content_type: how-to
+description: Set up a site in Zero Trust networking.
+products:
+  - cloudflare-one
+sidebar:
+  order: 1
+---
+
+import { Render } from "~/components";
+
+<Render
+	file="sites/sites"
+	product="networking-services"
+	params={{
+		magicWord: "CF1 Cloudflare WAN",
+		greIpsecTunnelsURL: "/cloudflare-one/networks/connectors/cloudflare-wan/configuration/how-to/configure-tunnel-endpoints/",
+		connectorURL: "/cloudflare-one/networks/connectors/cloudflare-wan/configuration/appliance/",
+		cniURL: "/cloudflare-one/networks/connectors/cloudflare-wan/network-interconnect/",
+		connectorName: "Cloudflare One Appliance",
+		magicTunnelHcsURL: "/cloudflare-one/networks/connectors/cloudflare-wan/configuration/common-settings/configure-tunnel-health-alerts/"
+	}}
+/>

@@ -1,0 +1,10 @@
+---
+pcx_content_type: navigation
+title: Queues
+external_link: /queues/configuration/javascript-apis/
+head: []
+description: Send and receive messages with guaranteed delivery.
+
+products:
+  - workers
+---
