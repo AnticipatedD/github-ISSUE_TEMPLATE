@@ -94,7 +94,7 @@ Cloudflare trademarks remain the property of Cloudflare, Inc.
  */
 
 export const ALGOLIA_APP_ID =
-    import.meta.env.PUBLIC_ALGOLIA_APP_ID ?? "D32WIYFTUF";
+    import.meta.env.PUBLIC_ALGOLIA_APP_ID ?? "YOUR_ALGOLIA_APP_ID";
 
 export const ALGOLIA_API_KEY =
     import.meta.env.PUBLIC_ALGOLIA_API_KEY ?? "";
