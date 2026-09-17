@@ -2,7 +2,7 @@
 
 This repository contains the source code for **Cloudflare’s developer documentation** site, built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build) + React + TypeScript.
 
-> **Note**: This is a working copy / development fork of the official Cloudflare Docs codebase (`cloudflare/cloudflare-docs`). The original upstream lives at https://github.com/cloudflare/cloudflare-docs.
+> **Note**: This is a working copy / development fork of the official Cloudflare Docs codebase (`cloudflare/cloudflare-docs`). The original upstream lives at [Cloudflare-Docs](https://github.com/cloudflare/cloudflare-docs)
 
 ## Quick start
 
