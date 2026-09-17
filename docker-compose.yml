@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web-app:
+    build:
+      context: .
+      target: dev
+    container_name: vane_guard_app
+    environment:
+      - NODE_ENV=development
+      - PUBLIC_ALGOLIA_APP_ID=mock_app_id
+      - PUBLIC_ALGOLIA_API_KEY=YOUR_API_KEY_HERE
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "4321:4321"
+    command: pnpm dev
