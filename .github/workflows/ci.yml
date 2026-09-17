@@ -327,6 +327,16 @@ jobs:
         with:
           name: dist
           path: dist
+          
+       - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify application build
+        run: pnpm build
+
+      - name: Execute automated unit test suite
+        run: pnpm test -- --run --coverage
+
 
       - name: Deploy to Cloudflare Workers
         id: deploy
