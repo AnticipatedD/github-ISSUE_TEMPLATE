@@ -1,46 +1,21 @@
-import { defineConfig, defineProject } from "vitest/config";
-import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
-import { getViteConfig } from "astro/config";
-
-import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-	test: {
-		projects: [
-			defineConfig({
-				plugins: [
-					cloudflareTest({
-						wrangler: { configPath: "./wrangler.jsonc" },
-					}),
-				],
-				test: {
-					name: "Workers",
-					include: ["**/*.worker.test.ts"],
-					deps: {
-						optimizer: {
-							ssr: {
-								enabled: true,
-								include: ["node-html-parser", "yaml"],
-							},
-						},
-					},
-				},
-			}),
-			defineProject({
-				test: {
-					name: "Node",
-					include: ["**/*.node.test.ts"],
-					environment: "happy-dom",
-				},
-				plugins: [tsconfigPaths()],
-			}),
-			getViteConfig({
-				test: {
-					name: "Astro",
-					include: ["**/*.astro.test.ts"],
-				},
-				plugins: [tsconfigPaths()],
-			}),
-		],
-	},
+  test: {
+    globals: true,
+    environment: 'node',
+    // Reference our unified test setup file
+    setupFiles: ['./tests/setup.ts'],
+    // Configure strict coverage boundaries
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      thresholds: {
+        lines: 50,
+        functions: 50,
+        branches: 50,
+        statements: 50,
+      },
+    },
+  },
 });
