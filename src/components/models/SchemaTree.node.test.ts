@@ -1,9 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-// Adjust the import path if the component exports differently
+import React from "react";
 import SchemaTree from "./SchemaTree";
 
-// Minimal mock schema that the component can render
 const mockSchema = {
     type: "object",
     properties: {
@@ -20,34 +19,40 @@ const mockSchema = {
 };
 
 describe("SchemaTree", () => {
-    it("renders without crashing", () => {
+    it("renders without crashing and mounts container", () => {
         const { container } = render(<SchemaTree schema={mockSchema} />);
-        expect(container).toBeTruthy();
+        expect(container.firstChild).not.toBeNull();
     });
 
-    it("shows top-level property names", () => {
+    it("shows top-level property names in the DOM", () => {
         render(<SchemaTree schema={mockSchema} />);
-        // Adjust selectors once you inspect the real DOM output
-        expect(screen.getByText(/name/i)).toBeTruthy();
-        expect(screen.getByText(/age/i)).toBeTruthy();
+        expect(screen.getByText("name")).toBeInTheDocument();
+        expect(screen.getByText("age")).toBeInTheDocument();
     });
 
     it("supports expand / collapse of nested objects", async () => {
         render(<SchemaTree schema={mockSchema} />);
 
-        // Example – replace with the actual expand button / toggle that exists
-        const expandButtons = screen.queryAllByRole("button");
-        if (expandButtons.length > 0) {
-            fireEvent.click(expandButtons[0]);
-            // After expand you should see nested keys
-            // expect(screen.getByText(/street/i)).toBeTruthy();
-        }
+        const expandButton = screen.getByRole("button", { name: /address/i });
+        expect(expandButton).toBeInTheDocument();
+
+        fireEvent.click(expandButton);
+
+        expect(await screen.findByText("street")).toBeInTheDocument();
+        expect(screen.getByText("city")).toBeInTheDocument();
     });
 
     it("highlights matching search terms when a search filter is provided", () => {
-        // If SchemaTree accepts a search/filter prop, test it here
-        // render(<SchemaTree schema={mockSchema} search="street" />);
-        // expect(...).toHaveClass("highlight") or similar
-        expect(true).toBe(true); // placeholder – implement once you inspect props
+        render(<SchemaTree schema={mockSchema} search="street" />);
+
+        const highlightElement = screen.getByText((content, element) => {
+            return (
+                element?.tagName.toLowerCase() === "mark" &&
+                element.textContent === "street"
+            );
+        });
+
+        expect(highlightElement).toBeInTheDocument();
+        expect(highlightElement).toHaveClass("highlight");
     });
 });
