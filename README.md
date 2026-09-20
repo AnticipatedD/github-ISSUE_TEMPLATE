@@ -2,13 +2,17 @@
 
 This repository contains the source code for **Cloudflare’s developer documentation** site, built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build) + React + TypeScript.
 
-> **Note**: This is a working copy / development fork of the official Cloudflare Docs codebase (`cloudflare/cloudflare-docs`). The original upstream lives at [Cloudflare-Docs](https://github.com/cloudflare/cloudflare-docs)
+> **Note**: This is a working copy / development fork of the official Cloudflare Docs codebase (`cloudflare/cloudflare-docs`). The original upstream lives at [Cloudflare-Docs](https://github.com/cloudflare/cloudflare-docs).
 
-## Quick start
+---
 
-**Prerequisites**
+## Quick Start
+
+### Prerequisites
 - Node.js ≥ 24
 - pnpm (enforced via `only-allow`)
+
+### Setup and Development
 
 ```bash
 # Install dependencies
@@ -19,21 +23,21 @@ pnpm dev
 # → http://localhost:4321 (or the port shown)
 
 # Type-check + worker checks
-`pnpm run check`
+pnpm run check
 
 # Run tests
-`pnpm test`
+pnpm test
 
 # Production build
-`pnpm run build`
-
+pnpm run build
+```
+# Environment Configuration
 Copy the environment template before running some scripts:
 ```bash
 `cp .env.example` `.env.local`
-
 # Edit `.env.local` with any required values
 ```
-
+---
 # Architecture overview data
 
 | Path              | Purpose                                   |
@@ -55,53 +59,35 @@ Copy the environment template before running some scripts:
 
 # Environment variables 
 See `.env.example` for the full list of variables referenced by the codebase.
-Most are optional for a basic local `pnpm dev` run. Search-related features need the public Algolia keys. 
+Most are optional for a basic local `pnpm dev` run. Search-related features need the public Algolia keys 
+`.env.local`:
+- ​PUBLIC_ALGOLIA_APP_ID
+- PUBLIC_ALGOLIA_API_KEY
+
 
 # Testing
 ```bash
-pnpm test                    # all projects
+pnpm test                    # Run all test suites
 pnpm test --project Node     # Node / happy-dom tests only
-pnpm test -- --coverage      # with coverage (once configured)
+pnpm test -- --coverage      # Execute tests with coverage reporting
 ```
-Tests live next to source files and follow the naming convention `*.node.test.ts`, `*.astro.test.ts`, or `*.worker.test.ts`. 
+Tests reside alongside source files using project-specific extensions:
+- `​*.node.test.ts`
+- `*.astro.test.ts`
+- ​`*.worker.test.ts`. 
 
 # Contributing / Development notes
-- Prefer small, focused commits that include the corresponding tests.
-- Run `pnpm run check` and `pnpm test` before pushing.
-- Formatting is enforced via Prettier + Husky.
+
+- **Atomic Commits**: Prefer small, focused commits using conventional commit syntax (`feat`:, `fix`:, `test`:, `docs`:).
+- **​Test-Driven**: Always include or update unit test files alongside source code changes.
+- **​Pre-flight Checks**: Run `pnpm run check` and `pnpm test` before pushing to remote branches.
+- **​Code Style**: Formatting is automatically validated and enforced via Prettier and ESLint.
 
 # License 
 This project follows the same licenses as the upstream Cloudflare Docs repository: 
-- Documentation content: Creative Commons Attribution 4.0 (LICENSE)
-- Code: MIT (LICENSE-CODE)
-
-Cloudflare trademarks remain the property of Cloudflare, Inc. 
-
-*Last updated for DataFactor score improvements*
+- Documentation content: Creative Commons Attribution 4.0 [LICENSE](license.md)
+- Code: MIT [LICENSE-CODE](license-code.md)
 
 ---
-
-### 2. `src/util/algolia.ts` (replace the whole file)
-
-```ts
-/**
- * Algolia configuration for Cloudflare Docs search.
- * Values are read from environment variables so secrets never live in source.
- *
- * Set these in .env.local (or your deployment environment):
- *   PUBLIC_ALGOLIA_APP_ID=...
- *   PUBLIC_ALGOLIA_API_KEY=...   (search-only key)
- */
-
-export const ALGOLIA_APP_ID =
-    import.meta.env.PUBLIC_ALGOLIA_APP_ID ?? "YOUR_ALGOLIA_APP_ID";
-
-export const ALGOLIA_API_KEY =
-    import.meta.env.PUBLIC_ALGOLIA_API_KEY ?? "";
-
-export const ALGOLIA_INDEX = "prod_devdocs";
-export const ALGOLIA_INDEX_STYLE_GUIDE = "prod_devdocs_styleguide";
-```
-
-> [!IMPORTANT]
->: *After this change, if the old key was a live production key, rotate it in the Algolia dashboard because it still exists in git history.*
+*Cloudflare trademarks remain the property of Cloudflare, Inc.* 
+Copyright © 2026 MD ABUL HOSSAIN. All Rights Reserved.
