@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import React from "react";
 import ModelCatalog from "../ModelCatalog";
 
-// Minimal model data that matches ModelCardData shape
 const mockModels = [
     {
         name: "@cf/meta/llama-3",
@@ -24,43 +24,51 @@ const mockModels = [
     },
 ] as any[];
 
-// Mock URL helpers that ModelCatalog uses
 vi.mock("~/util/url", () => ({
     setSearchParams: vi.fn(),
 }));
 
 describe("ModelCatalog", () => {
     beforeEach(() => {
-        // Reset URL between tests if needed
         window.history.pushState({}, "", "/");
+        vi.clearAllMocks();
     });
 
     it("renders the search input and filter controls", () => {
         render(<ModelCatalog models={mockModels} />);
-        expect(screen.getByPlaceholderText(/search models/i)).toBeTruthy();
+        expect(
+            screen.getByPlaceholderText(/search models/i)
+        ).toBeInTheDocument();
     });
 
-    it("filters models by search text", () => {
+    it("filters models by search text and updates visible cards", () => {
         render(<ModelCatalog models={mockModels} />);
         const input = screen.getByPlaceholderText(/search models/i);
+
         fireEvent.change(input, { target: { value: "llama" } });
 
-        // The component filters client-side; assert the visible model names
-        // (exact assertion depends on how ModelInfo renders the name)
-        expect(screen.getByText(/llama/i)).toBeTruthy();
+        expect(screen.getByText("@cf/meta/llama-3")).toBeInTheDocument();
+        expect(
+            screen.queryByText("@cf/openai/gpt-oss")
+        ).not.toBeInTheDocument();
+        expect(
+            screen.queryByText("@cf/black-forest-labs/flux")
+        ).not.toBeInTheDocument();
     });
 
     it("renders SortSelect and can change sort order", () => {
         render(<ModelCatalog models={mockModels} />);
-        // Look for the sort trigger (text "Newest first" by default)
         const sortTrigger = screen.getByText(/newest first/i);
-        expect(sortTrigger).toBeTruthy();
+        expect(sortTrigger).toBeInTheDocument();
     });
 
-    it("shows FilterDropdowns for authors / tasks / capabilities", () => {
+    it("renders distinct FilterDropdown controls for tasks, authors, and capabilities", () => {
         render(<ModelCatalog models={mockModels} />);
-        // These labels come from the FilterDropdown component
-        // Adjust once you confirm the exact button text
-        expect(screen.getByText(/tasks/i) || screen.getByText(/authors/i)).toBeTruthy();
+
+        const tasksFilter = screen.getByRole("button", { name: /tasks/i });
+        const authorsFilter = screen.getByRole("button", { name: /authors/i });
+
+        expect(tasksFilter).toBeInTheDocument();
+        expect(authorsFilter).toBeInTheDocument();
     });
 });
