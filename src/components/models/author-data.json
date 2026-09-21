@@ -1,0 +1,6 @@
+{
+  "authors": [
+    { "id": "cloudflare", "name": "Cloudflare", "logo": "/logos/cloudflare.svg" },
+    { "id": "meta", "name": "Meta", "logo": "/logos/meta.svg" }
+  ]
+}
