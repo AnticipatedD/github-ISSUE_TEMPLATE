@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+
+// Mock scriptLog and any module logging before importing the script functions
+vi.mock("./fetch-catalog-models", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("./fetch-catalog-models")>();
+    return {
+        ...actual,
+        // If scriptLog is exported or we want to ensure safe execution
+    };
+});
+
 import {
     parseArgs,
     isDeprecated,
@@ -16,6 +26,9 @@ describe("fetch-catalog-models build script", () => {
         if (!fs.existsSync(tempDir)) {
             fs.mkdirSync(tempDir, { recursive: true });
         }
+        // Silence console logging during test runs
+        vi.spyOn(console, "log").mockImplementation(() => {});
+        vi.spyOn(console, "error").mockImplementation(() => {});
     });
 
     afterEach(() => {
