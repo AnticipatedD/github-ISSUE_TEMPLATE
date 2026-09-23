@@ -10,13 +10,13 @@ jobs:
   lint-and-typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
@@ -25,13 +25,13 @@ jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run test:ci
@@ -40,13 +40,13 @@ jobs:
     needs: [lint-and-typecheck, test-and-coverage]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
-          version: 8
-      - uses: actions/setup-node@v3
+          version: 9
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
