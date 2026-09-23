@@ -1,7 +1,15 @@
 import { useState, useMemo } from "react";
 import RTKUIComponent from "../RTKUIComponent/RTKUIComponent";
 
-const componentGalleryImageModules = import.meta.glob(
+interface ComponentItem {
+	id: string;
+	name: string;
+	imagePath: string;
+	componentName: string;
+	tags: string[];
+}
+
+const componentGalleryImageModules = import.meta.glob<{ default: { src?: string } | string }>(
 	"../../../assets/images/realtime/realtimekit/web/components-gallery/*.svg",
 	{ eager: true },
 );
@@ -9,18 +17,21 @@ const componentGalleryImageModules = import.meta.glob(
 const componentGalleryImageSrcByFileName = Object.fromEntries(
 	Object.entries(componentGalleryImageModules).map(([path, mod]) => {
 		const fileName = path.split("/").pop() as string;
-		const defaultExport = (mod as any).default;
-		const src = defaultExport?.src ?? defaultExport;
-		return [fileName, src];
+		const defaultExport = mod.default;
+		const src = typeof defaultExport === "object" && defaultExport !== null && "src" in defaultExport
+			? defaultExport.src
+			: (defaultExport as string);
+		return [fileName, src ?? ""];
 	}),
 ) as Record<string, string>;
 
 const imageSrc = (fileName: string) =>
-	componentGalleryImageSrcByFileName[fileName];
+	componentGalleryImageSrcByFileName[fileName] || "";
 
 const RTKUIComponentGrid = () => {
 	const [searchTerm, setSearchTerm] = useState("");
-	const basicComponents = [
+	
+	const basicComponents: ComponentItem[] = [
 		{
 			id: "rtk-avatar",
 			name: "Avatar",
@@ -99,7 +110,8 @@ const RTKUIComponentGrid = () => {
 			tags: ["tooltip", "controlbar", "button"],
 		},
 	];
-	const uiComponents = [
+
+	const uiComponents: ComponentItem[] = [
 		{
 			id: "rtk-controlbar",
 			name: "Control Bar",
@@ -178,7 +190,8 @@ const RTKUIComponentGrid = () => {
 			tags: ["plugin-main", "plugin", "sidebar", "controlbar", "button"],
 		},
 	];
-	const compositeComponents = [
+
+	const compositeComponents: ComponentItem[] = [
 		{
 			id: "rtk-chat",
 			name: "Chat",
@@ -315,7 +328,8 @@ const RTKUIComponentGrid = () => {
 			tags: ["spotlight", "grid", "participant", "tile", "layout", "pinned"],
 		},
 	];
-	const screenComponents = [
+
+	const screenComponents: ComponentItem[] = [
 		{
 			id: "rtk-ended-screen",
 			name: "Ended Screen",
@@ -346,18 +360,14 @@ const RTKUIComponentGrid = () => {
 		},
 	];
 
-	// Filter function to search through components
-	const filterComponents = (components: typeof basicComponents) => {
+	const filterComponents = (components: ComponentItem[]) => {
 		if (!searchTerm.trim()) return components;
 
 		const lowercaseSearch = searchTerm.toLowerCase();
 		return components.filter((component) => {
-			// Search in name
 			if (component.name.toLowerCase().includes(lowercaseSearch)) return true;
-			// Search in component name
 			if (component.componentName.toLowerCase().includes(lowercaseSearch))
 				return true;
-			// Search in tags
 			if (
 				component.tags.some((tag) =>
 					tag.toLowerCase().includes(lowercaseSearch),
@@ -368,7 +378,6 @@ const RTKUIComponentGrid = () => {
 		});
 	};
 
-	// Filtered component arrays
 	const filteredBasicComponents = useMemo(
 		() => filterComponents(basicComponents),
 		[searchTerm],
@@ -390,7 +399,7 @@ const RTKUIComponentGrid = () => {
 		<div>
 			<h2 className="mb-2 text-2xl font-bold">Component Gallery</h2>
 			<p className="mb-4">
-				Search through the comoponent gallery for the component you need.
+				Search through the component gallery for the component you need.
 			</p>
 			<input
 				className="mb-2 w-full rounded-md border bg-neutral-50 p-1 px-2 dark:border-neutral-600 dark:bg-neutral-800"
@@ -399,7 +408,6 @@ const RTKUIComponentGrid = () => {
 				onChange={(e) => setSearchTerm(e.target.value)}
 			/>
 
-			{/* Show no results message if search term exists but no components found */}
 			{searchTerm.trim() &&
 				filteredBasicComponents.length === 0 &&
 				filteredUiComponents.length === 0 &&
@@ -416,7 +424,6 @@ const RTKUIComponentGrid = () => {
 					</div>
 				)}
 
-			{/* Basic Components */}
 			{filteredBasicComponents.length > 0 && (
 				<>
 					<h2 className="mb-2 text-2xl font-bold">Basic Components</h2>
@@ -435,7 +442,6 @@ const RTKUIComponentGrid = () => {
 				</>
 			)}
 
-			{/* UI Components */}
 			{filteredUiComponents.length > 0 && (
 				<>
 					<h2 className="mb-2 text-2xl font-bold">UI Components</h2>
@@ -454,7 +460,6 @@ const RTKUIComponentGrid = () => {
 				</>
 			)}
 
-			{/* Composite Components */}
 			{filteredCompositeComponents.length > 0 && (
 				<>
 					<h2 className="mb-2 text-2xl font-bold">Composite Components</h2>
@@ -475,7 +480,6 @@ const RTKUIComponentGrid = () => {
 				</>
 			)}
 
-			{/* Screen Components */}
 			{filteredScreenComponents.length > 0 && (
 				<>
 					<h2 className="mb-2 text-2xl font-bold">Screen Components</h2>
