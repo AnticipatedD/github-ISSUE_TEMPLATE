@@ -13,16 +13,29 @@ type LearningPathsData = keyof CollectionEntry<"learning-paths">["data"];
 
 type ResourcesData = DocsData | VideosData | LearningPathsData;
 
+export interface SelectOption {
+	value: string;
+	label: string;
+}
+
+export type ResourceEntry = (
+	| CollectionEntry<"docs">
+	| CollectionEntry<"stream">
+	| CollectionEntry<"learning-paths">
+) & {
+	data: Record<string, unknown> & {
+		title?: string;
+		description?: string;
+		reviewed?: Date | string | number;
+		productTitles?: string[];
+		head?: Array<{ tag: string; content?: string }>;
+		url?: string;
+		path?: string;
+	};
+};
+
 interface Props {
-	resources: Array<
-		(
-			| CollectionEntry<"docs">
-			| CollectionEntry<"stream">
-			| CollectionEntry<"learning-paths">
-		) & {
-			data: any & { productTitles?: string[] };
-		}
-	>;
+	resources: Array<ResourceEntry>;
 	facets: Record<string, string[]>;
 	filters?: ResourcesData[];
 	columns: number;
@@ -49,13 +62,16 @@ export default function ResourcesBySelector({
 		selectedValues: {},
 	});
 
-	const timeAgo = (date?: Date) => {
+	const timeAgo = (date?: Date | string | number) => {
 		if (!date) return undefined;
-		return formatDistance(date, new Date(), { addSuffix: true });
+		const parsedDate = typeof date === "object" ? date : new Date(date);
+		if (isNaN(parsedDate.getTime())) return undefined;
+		return formatDistance(parsedDate, new Date(), { addSuffix: true });
 	};
 
-	const handleFilterChange = (option: any) => {
-		setSelectedFilter(option?.value || null);
+	const handleFilterChange = (option: unknown) => {
+		const opt = option as SelectOption | null;
+		setSelectedFilter(opt?.value || null);
 	};
 
 	const options = Object.entries(facets).map(([key, values]) => ({
@@ -71,30 +87,26 @@ export default function ResourcesBySelector({
 			})),
 	}));
 
-	// Keep facets organized by filterable field for left sidebar
-
 	const visibleResources = resources
 		.filter((resource) => {
-			// Handle top filter (ReactSelect)
 			if (filterPlacement === "top" && selectedFilter && filters) {
 				const filterableValues: string[] = [];
 				for (const filter of filters) {
 					if (filter === "products" && resource.data.productTitles) {
-						// Use resolved product titles for products filter
 						filterableValues.push(...resource.data.productTitles);
 					} else {
-						const val = resource.data[filter as keyof typeof resource.data];
+						const val = resource.data[filter as string];
 						if (val) {
 							if (
 								Array.isArray(val) &&
 								val.every((v) => typeof v === "string")
 							) {
-								filterableValues.push(...val);
+								filterableValues.push(...(val as string[]));
 							} else if (
 								Array.isArray(val) &&
-								val.every((v) => typeof v === "object")
+								val.every((v) => v !== null && typeof v === "object" && "id" in v)
 							) {
-								filterableValues.push(...val.map((v) => v.id));
+								filterableValues.push(...(val as Array<{ id: string }>).map((v) => v.id));
 							} else if (typeof val === "string") {
 								filterableValues.push(val);
 							}
@@ -104,31 +116,27 @@ export default function ResourcesBySelector({
 				if (!filterableValues.includes(selectedFilter)) return false;
 			}
 
-			// Handle left sidebar filters
 			if (filterPlacement === "left" && filters) {
-				// Check each filterable field separately
 				for (const [filterField, selectedValues] of Object.entries(
 					leftFilters.selectedValues,
 				)) {
 					if (selectedValues.length > 0) {
 						const resourceValues: string[] = [];
 						if (filterField === "products" && resource.data.productTitles) {
-							// Use resolved product titles for products filter
 							resourceValues.push(...resource.data.productTitles);
 						} else {
-							const val =
-								resource.data[filterField as keyof typeof resource.data];
+							const val = resource.data[filterField];
 							if (val) {
 								if (
 									Array.isArray(val) &&
 									val.every((v) => typeof v === "string")
 								) {
-									resourceValues.push(...val);
+									resourceValues.push(...(val as string[]));
 								} else if (
 									Array.isArray(val) &&
-									val.every((v) => typeof v === "object")
+									val.every((v) => v !== null && typeof v === "object" && "id" in v)
 								) {
-									resourceValues.push(...val.map((v) => v.id));
+									resourceValues.push(...(val as Array<{ id: string }>).map((v) => v.id));
 								} else if (typeof val === "string") {
 									resourceValues.push(val);
 								}
@@ -140,11 +148,10 @@ export default function ResourcesBySelector({
 					}
 				}
 
-				// Search filter
 				if (leftFilters.search) {
 					const searchTerm = leftFilters.search.toLowerCase();
-					const title = resource.data.title?.toLowerCase() || "";
-					const description = resource.data.description?.toLowerCase() || "";
+					const title = String(resource.data.title || "").toLowerCase();
+					const description = String(resource.data.description || "").toLowerCase();
 
 					if (
 						!title.includes(searchTerm) &&
@@ -171,16 +178,14 @@ export default function ResourcesBySelector({
 				setSelectedFilter(value);
 			}
 		} else if (filterPlacement === "left") {
-			// Handle left sidebar URL params
 			const searchTerm = params.get("search-term") ?? "";
 			const selectedValues: Record<string, string[]> = {};
 
-			// Get values for each filterable field from URL params
 			if (filters) {
 				for (const filter of filters) {
 					const values = params.getAll(`filter-${filter}`);
 					if (values.length > 0) {
-						selectedValues[filter] = values;
+						selectedValues[filter as string] = values;
 					}
 				}
 			}
@@ -192,9 +197,8 @@ export default function ResourcesBySelector({
 				});
 			}
 		}
-	}, [filterPlacement]);
+	}, [filterPlacement, filters]);
 
-	// Update URL params for left sidebar filters
 	useEffect(() => {
 		if (filterPlacement === "left") {
 			const params = new URLSearchParams();
@@ -203,7 +207,6 @@ export default function ResourcesBySelector({
 				params.set("search-term", leftFilters.search);
 			}
 
-			// Add URL params for each filterable field
 			for (const [filterField, selectedValues] of Object.entries(
 				leftFilters.selectedValues,
 			)) {
@@ -329,32 +332,31 @@ export default function ResourcesBySelector({
 					className={`grid ${columns === 1 ? "md:grid-cols-1" : columns === 2 ? "md:grid-cols-2" : "md:grid-cols-3"} grid-cols-1 gap-4`}
 				>
 					{visibleResources.map((page) => {
-						let href;
+						let href: string;
 						switch (page.collection) {
 							case "docs":
 								href = `/${page.id}/`;
 								break;
 							case "learning-paths":
-								href = `${page.data.path}/`;
+								href = `${page.data.path ?? ""}/`;
 								break;
 							case "stream":
-								href = `/videos/${page.data.url}/`;
+								href = `/videos/${page.data.url ?? ""}/`;
 								break;
 							default:
-								href = `/${(page as any).id}/`;
+								href = `/${page.id}/`;
 								break;
 						}
 
-						// title can either be set directly in title or added as a meta.title property when we want something different for sidebar and SEO titles
-						let title;
+						let title: string | undefined;
 
-						if (page.collection === "docs") {
+						if (page.collection === "docs" && page.data.head) {
 							const titleItem = page.data.head.find(
-								(item: any) => item.tag === "title",
+								(item) => item.tag === "title",
 							);
-							title = titleItem ? titleItem.content : page.data.title;
+							title = titleItem ? titleItem.content : (page.data.title as string);
 						} else {
-							title = page.data.title;
+							title = page.data.title as string;
 						}
 
 						return (
@@ -366,22 +368,22 @@ export default function ResourcesBySelector({
 								<p className="decoration-accent underline decoration-2 underline-offset-4">
 									{title}
 								</p>
-								{showDescriptions && (
-									<span className="line-clamp-3" title={page.data.description}>
+								{showDescriptions && page.data.description && (
+									<span className="line-clamp-3" title={String(page.data.description)}>
 										<Markdown
 											disallowedElements={["a"]}
 											unwrapDisallowed={true}
 										>
-											{page.data.description}
+											{String(page.data.description)}
 										</Markdown>
 									</span>
 								)}
-								{showLastUpdated && "reviewed" in page.data && (
+								{showLastUpdated && "reviewed" in page.data && page.data.reviewed && (
 									<span
 										className="line-clamp-3"
-										title={`Updated ${timeAgo(page.data.reviewed)}`}
+										title={`Updated ${timeAgo(page.data.reviewed as Date)}`}
 									>
-										Updated {timeAgo(page.data.reviewed)}
+										Updated {timeAgo(page.data.reviewed as Date)}
 									</span>
 								)}
 							</a>
