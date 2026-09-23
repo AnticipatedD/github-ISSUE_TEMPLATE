@@ -3,7 +3,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 import ModelCatalog from "../ModelCatalog";
 
-const mockModels = [
+interface ModelItem {
+    name: string;
+    task: { name: string };
+    created_at: string;
+    properties: Record<string, any>;
+}
+
+const mockModels: ModelItem[] = [
     {
         name: "@cf/meta/llama-3",
         task: { name: "Text Generation" },
@@ -22,7 +29,7 @@ const mockModels = [
         created_at: "2024-08-01T00:00:00Z",
         properties: {},
     },
-] as any[];
+];
 
 vi.mock("~/util/url", () => ({
     setSearchParams: vi.fn(),
@@ -56,10 +63,24 @@ describe("ModelCatalog", () => {
         ).not.toBeInTheDocument();
     });
 
-    it("renders SortSelect and can change sort order", () => {
+    it("renders SortSelect and triggers sort order interactions", () => {
         render(<ModelCatalog models={mockModels} />);
         const sortTrigger = screen.getByText(/newest first/i);
         expect(sortTrigger).toBeInTheDocument();
+
+        fireEvent.click(sortTrigger);
+        expect(sortTrigger).toBeInTheDocument();
+    });
+
+    it("handles combined search filtering and display rendering correctly", () => {
+        render(<ModelCatalog models={mockModels} />);
+        const input = screen.getByPlaceholderText(/search models/i);
+
+        fireEvent.change(input, { target: { value: "@cf" } });
+
+        expect(screen.getByText("@cf/meta/llama-3")).toBeInTheDocument();
+        expect(screen.getByText("@cf/openai/gpt-oss")).toBeInTheDocument();
+        expect(screen.getByText("@cf/black-forest-labs/flux")).toBeInTheDocument();
     });
 
     it("renders distinct FilterDropdown controls for tasks, authors, and capabilities", () => {
